@@ -63,7 +63,7 @@ Go to Easees API under Site/Get Site:  https://developer.easee.cloud/reference/g
   2. make sure detailed is set to True
   3. press try it
   ![image](https://user-images.githubusercontent.com/7197181/196772350-dca19b13-1e25-43ab-8d4c-2eb8742e83d6.png)
-  5. it should return a long piece of JSON. on line 37 you should find the SiteId
+  5. it should return a long piece of JSON. on line 37 you should find the CircuitId
   ![image](https://user-images.githubusercontent.com/7197181/196772532-1f3fd74e-c6e5-4e6e-9494-7e51c65822d6.png)
   7. open EaseeLoadBalancer.py and input the value we just found.
 
