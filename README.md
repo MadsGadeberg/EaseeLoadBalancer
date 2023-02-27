@@ -1,6 +1,6 @@
 # EaseeLoadBalancer
 
-This project reads the excess solar power via modbusTCP and sets the easee charger to charge acordingly.
+This project reads the excess solar power via modbusTCP and sets the Easee charger to charge accordingly.
 
 As of now the project is compatible with Huawei Sun2000 inverters that have installed a network dongle and an Easee Charger.
 
@@ -10,7 +10,7 @@ EaseeLoadBalancer interfaces with the Huawei inverter and reads the following da
 - Battery Charge Power
 - Battery SOC
 
-EaseeLoacBalancer interfaces with the Easee Charger with their public API. This is used to do serveral things but most importantly is getting the actual charge power to calculate the new setpoint.
+EaseeLoadBalancer interfaces with the Easee Charger with their public API. This is used to do several things but most importantly is getting the actual charge power to calculate the new setpoint.
 
 The formula for setting the charge power is the following:
 newSp = carCharge + export + batteryCharge
@@ -22,10 +22,10 @@ Guide:
 Follow this guide: https://forum.huawei.com/enterprise/en/modbus-tcp-guide/thread/789585-100027
 
 2.  Installing python
-install python on the device you intend to use. There are serveral guides to do this on the internet. I reccoment to get Visual Studio Code for this untill you are up and running.
+install python on the device you intend to use. There are several guides to do this on the internet. I recommend to get Visual Studio Code (VS Code) for this until you are up and running.
 
 3.  Download EaseeLoadBalancer
-Download the EaseeLoadBalancer.py and open it in your prefered texteditor(VS Code).
+Download the EaseeLoadBalancer.py and open it in your preferred text editor (VS Code).
 
 4.  Change program parameters to your own
 To use the program at your site you need to change the following parameters in the top
@@ -37,16 +37,16 @@ To use the program at your site you need to change the following parameters in t
 - CIRCUIT_ID = see step 5
 - USERNAME = the same you use for logging in to your easee.cloud account
 - PASSWORD = the same you use for logging in to your easee.cloud account
-- INVERTER_IP = '192.168.x.x'the ip that your Sun2000 inverte has on your local network. I reccomend setting a static ip in your router
+- INVERTER_IP = '192.168.x.x'the ip that your Sun2000 inverte has on your local network. I recommend setting a static IP in your router.
 - INVERTER_PORT = 502           #<------- should be 502
 Charger and SiteId can be found by logging in to easee.cloud. There you can find your ChargerID under "Products" pane
 ![image](https://user-images.githubusercontent.com/7197181/196766935-a1aa9b99-668e-4404-97b6-ca071ec91f66.png)
 
 5.
-To obtain the CircuitID we need to use the API. An API is an Application Programming Interface. Its just a way of enabling programs to communicate with other programs. As we are doing in this case.
+To obtain the CircuitID we need to use the API. An API is an Application Programming Interface. It's just a way of enabling programs to communicate with other programs. As we are doing in this case.
 
 5.1
-In order to retrieve the CircuitId we need to "log in" and get a token. A token is just a very complex string the api returns upon logging in. This "Token" is used instead of our login cridentials. This is done to security reasons.
+In order to retrieve the CircuitId we need to log in and get a token. A token is just a very complex string with information about who the user is that the API returns upon logging in. This token is used instead of our login credentials. This is done for security reasons.
 
 Go to Easees API under Account/Authentication: https://developer.easee.cloud/reference/post_api-accounts-login
   1 and 2. input your username and password.
@@ -58,7 +58,7 @@ Go to Easees API under Account/Authentication: https://developer.easee.cloud/ref
   ![image](https://user-images.githubusercontent.com/7197181/196771354-3274acf2-bd69-451a-b63f-f7a1a7d9f08b.png)
 
 5.3 Get site
-Go to Easees API under Site/Get Site:  https://developer.easee.cloud/reference/getsitebyid
+Go to Easee's API under Site/Get Site:  https://developer.easee.cloud/reference/getsitebyid
   1. input the siteId we got earlier by logging into Easee.Cloud
   2. make sure detailed is set to True
   3. press try it
@@ -69,6 +69,6 @@ Go to Easees API under Site/Get Site:  https://developer.easee.cloud/reference/g
 
 6.
 we should now be able to run the program.
-When the rogramming is running you can see the logged and calculated data each time the program publishes new charge power to the charger.
+When the program is running you can see the logged and calculated data each time the program publishes new charge power to the charger.
 
 ![image](https://user-images.githubusercontent.com/7197181/196727816-9e2dd127-b4c4-4b43-bf59-671239491eee.png)
