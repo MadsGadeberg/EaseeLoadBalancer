@@ -237,45 +237,85 @@ class LoadBalancer():
         thread = threading.Timer(BROADCAST_CHARGE_DELAY, self.broadcastChargeCurrent).start()
 
         if threading.active_count() < 4:
-            production = self.inverter.getProduction()
             export = self.inverter.getExport()
             batterySOC = self.inverter.getSOC()
             batteryCharge = self.inverter.getBatCharge()
             carCharge = self.easeeCharger.getChargePower()
 
-            if None not in (export, production, carCharge, batteryCharge, batterySOC):
+            if None not in (export, carCharge, batteryCharge, batterySOC):
                 
-                newSp = carCharge + export + batteryCharge
-
-                if newSp < 0:
-                    newSp = 0
-                elif newSp > 16:
-                    newSp = 16
-                elif newSp < 4.2 and batterySOC > 90:
-                    newSp = 4.2
+                excessPowerTot  = carCharge + export + batCharge    # surplus power including battery charge
+                SP = 0
                 
-                chargeAmp = newSp * 1.44
+                if batSOC >= 100:
+                    self.mode = 0     # favour Car charging / discharge house battery
+                #elif batSOC >= 80:
+                #    self.mode = 2     # favour house battery but only a little
+                elif batSOC < 80:
+                    self.mode = 1     # favour house battery charging
+                      
+                if self.mode == 1:
+                    # this mode favors charging the battery with little excess power
+                    if excessPowerTot < 5:
+                        SP = 0
+                    elif 5 < excessPowerTot < (5+4.2):
+                        #SP = 1.4 ## 1 phase charging needs implementing before this works
+                        SP = 4.2
+                    elif (5+4.2) < excessPowerTot:
+                        SP = excessPowerTot - 5
+                elif self.mode == 0:
+                    # this mode discharges battery if there is little underksud in export.
+                    if 0 < excessPowerTot < 1.4:
+                        #SP = 1.4 ## 1 phase charging needs implementing before this works
+                        
+                        SP = 4.2
+                    elif 1.4 < excessPowerTot < 3.7:
+                        #SP = excessPowerTot # 1 phase      ## 1 phase charging needs implementing before this works
+                        SP = 4.2
+                    elif 3.7 < excessPowerTot < 4.2:
+                        SP = excessPowerTot # last phase setting to avoid phase setting changes
+                        #SP = excessPowerTot # 1 phase      ## 1 phase charging needs implementing before this works
+                        SP = 4.2
+                    elif 4.2 < excessPowerTot:
+                        SP = excessPowerTot + 0.5 # 3 phases
+                elif self.mode == 2:
+                    # this mode favors charging the battery with little excess power
+                    if excessPowerTot < 5:
+                        SP = 0
+                    elif 5 < excessPowerTot < (5+4.2):
+                        #SP = 1.4 ## 1 phase charging needs implementing before this works
+                        SP = excessPowerTot - 0.5
+                    elif (5+4.2) < excessPowerTot:
+                        SP = excessPowerTot - 0.5
+                      
+                if SP < 0:
+                    SP = 0
+                elif SP > 11.1:
+                    SP = 11.1
+                
+                chargeAmp = SP * 1.45
                 
                 self.easeeCharger.setCurrent(chargeAmp, TIME_TO_LIVE)
 
                 print("-----------------------")
-                print("production:      " + "{:.2f}kW".format(production))
+                print("Mode:            " + "{:.0f}".format(self.mode))
+                print("EPT:             " + "{:.2f}kW".format(excessPowerTot))
                 print("export:          " + "{:.2f}kW".format(export))
                 print("CarCharge:       " + "{:.2f}kW".format(carCharge))
-                print("batSOC:          " + "{:.0f}%".format(batterySOC))
-                print("batCharge:       " + "{:.2f}kW".format(batteryCharge))
-                print("newSp:           " + "{:.2f}kW".format(newSp))
+                print("batSOC:          " + "{:.0f}%".format(batSOC))
+                print("batCharge:       " + "{:.2f}kW".format(batCharge))
+                print("SP:              " + "{:.2f}kW".format(SP))
                 print("chargeAmp:       " + "{:.2f}A".format(chargeAmp))
-                print("ThreadCount:     " + str(threading.active_count()))
 
             else:
-                print("data error-------------")
-                print("production:      " + str(production))
-                print("export:          " + str(export))
-                print("CarCharge:       " + str(carCharge))
-                print("batSOC:          " + str(batterySOC))
-                print("batCharge:       " + str(batteryCharge))
-                print("ThreadCount:     " + str(threading.active_count()))
+                if export == None:
+                    print("export timeout")
+                elif carCharge == None:
+                    print("CarCharge timeout")
+                elif batCharge == None:
+                    print("batCharge timeout")
+                elif batSOC == None:
+                    print("batSOC timeout")
         else:
             print("Prior thread didnt execute:     " + str(threading.active_count()))
 
